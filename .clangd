@@ -1,0 +1,11 @@
+CompileFlags:
+  Add:
+    - -Wall
+    - -Wextra
+    - -Wheader-hygiene
+    - -Wpedantic
+    - -Wno-c++14-extensions
+    - -Wno-c++17-extensions
+    - -Wno-c++20-designator
+    - -Wno-c++20-extensions
+    - -xc++
