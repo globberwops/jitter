@@ -4,6 +4,7 @@
 #include <dlfcn.h>
 #include <exception>
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include <utility>
 
@@ -114,9 +115,10 @@ class DynamicLoader
     {
         m_handle = std::unique_ptr<void, Deleter>(dlopen(m_library_path.c_str(), m_flags), Deleter());
 
-        if (m_handle == nullptr)
+        auto *error = dlerror();
+        if (error)
         {
-            throw DynamicLoaderException(dlerror());
+            throw DynamicLoaderException(error);
         }
     }
 
@@ -127,21 +129,21 @@ class DynamicLoader
     }
 
     /// \brief Lookup a symbol in the open library
-    /// \tparam T The function signature of the symbol
+    /// \tparam Signature The function signature of the symbol
     /// \param[in] symbol The name of the symbol
     /// \return The function pointer of the symbol, if found
     /// \throws DynamicLoaderException
-    template <typename T> auto Lookup(std::string_view symbol) noexcept(false) -> T
+    template <class Signature> auto Lookup(std::string_view symbol) noexcept(false) -> std::function<Signature>
     {
-        void *func = nullptr;
-        func = dlsym(m_handle.get(), symbol.data());
+        auto *function_ptr = dlsym(m_handle.get(), symbol.data());
 
-        if (func == nullptr)
+        auto *error = dlerror();
+        if (error)
         {
-            throw DynamicLoaderException(dlerror());
+            throw DynamicLoaderException(error);
         }
 
-        return reinterpret_cast<T>(func); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+        return reinterpret_cast<Signature *>(function_ptr); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
     }
 };
 

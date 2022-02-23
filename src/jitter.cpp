@@ -39,13 +39,22 @@ auto Jitter::Compile(const fs::path &file_path) -> bool
 
     // open the library
     auto loader = DynamicLoader{out_file_path.c_str(), RTLD_LAZY};
-    using func_t = bool (*)();
-    func_t func = nullptr;
 
     try
     {
         loader.Open();
-        func = loader.Lookup<func_t>(out_file_path.stem().string());
+        {
+            auto func = loader.Lookup<void()>("jitter_test_file");
+            func();
+        }
+        {
+            auto func = loader.Lookup<bool()>("jitter_test_file_return");
+            func();
+        }
+        {
+            auto func = loader.Lookup<void(int)>("jitter_test_file_args");
+            func(42);
+        }
     }
     catch (const DynamicLoaderException &ex)
     {
@@ -53,7 +62,7 @@ auto Jitter::Compile(const fs::path &file_path) -> bool
         return false;
     }
 
-    return func();
+    return true;
 }
 
 } // namespace jitter
