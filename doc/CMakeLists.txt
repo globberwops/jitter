@@ -1,1 +1,5 @@
-message(AUTHOR_WARNING "TODO(globberwops): Build documentation")
+find_package(Doxygen)
+
+if(Doxygen_FOUND)
+  doxygen_add_docs(JitterDocs ${PROJECT_SOURCE_DIR}/include)
+endif()

@@ -10,7 +10,6 @@ class Jitter
 {
   public:
     Jitter() = default;
-    ~Jitter() = default;
 
     auto Compile(const std::filesystem::path &file_path) -> bool;
 };

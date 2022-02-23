@@ -7,7 +7,7 @@
 
 #include <dlfcn.h>
 
-#include "dynamic_loader.hpp"
+#include "jitter/dynamic_loader.hpp"
 
 namespace jitter
 {
@@ -39,12 +39,21 @@ auto Jitter::Compile(const fs::path &file_path) -> bool
 
     // open the library
     auto loader = DynamicLoader{out_file_path.c_str(), RTLD_LAZY};
-    if (!loader.Open())
+    using func_t = bool (*)();
+    func_t func = nullptr;
+
+    try
     {
+        loader.Open();
+        func = loader.Lookup<func_t>(out_file_path.stem().string());
+    }
+    catch (const DynamicLoaderException &ex)
+    {
+        std::cerr << ex.what() << '\n';
         return false;
     }
 
-    return loader();
+    return func();
 }
 
 } // namespace jitter

@@ -1,7 +1,7 @@
 add_library(Jitter)
 add_library(Jitter::Jitter ALIAS Jitter)
 
-target_sources(Jitter PRIVATE jitter.cpp dynamic_loader.cpp)
+target_sources(Jitter PRIVATE jitter.cpp)
 
 target_link_libraries(Jitter PUBLIC ${CMAKE_DL_LIBS})
 
